@@ -16,7 +16,7 @@
     (is (= (convert still) commands/stay-still))))
 
 (deftest invert-test
-  (test "invert"
+  (testing "invert"
     (is (= (invert north) south))
     (is (= (invert south) north))
     (is (= (invert east) west))
