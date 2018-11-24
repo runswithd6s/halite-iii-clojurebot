@@ -38,9 +38,16 @@
 (defn position?
   "Is x a position?"
   [x]
-  (and (vector? x) (= 2 (count x))))
+  (and (vector? x) (= 2 (count x)) (int? (first x)) (int? (last x))))
 
 (defn new-position
   "Create a new position"
   [x y]
   [x y])
+
+(defn dir-or-offset
+  "Returns direction or a converted offset as a direction."
+  [direction]
+  (if (position? direction)
+    (direction/convert direction)
+    direction))
