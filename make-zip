@@ -4,7 +4,7 @@
 # make -f make-zip
 
 # If you add additional namespaces put those files here
-MYFILES := ./hlt/app/MyBot.clj
+MYFILES := ./hlt/app/MyBot.clj ./hlt/app/MyBot/*.clj
 
 FILES := project.clj ./hlt/lib/hlt/*.clj $(MYFILES)
 
