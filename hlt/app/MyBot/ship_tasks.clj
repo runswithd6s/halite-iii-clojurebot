@@ -79,14 +79,18 @@
         direction (get (get-all-cardinals) (rrand-int 4))]
     (update-task ship :gather)
     (if (gather? ship cell 10)
-      (command (ship/stay-still ship))
-      (command
-       (ship/move ship (game-map/naive-navigate direction))))))
+      (do
+        (log "Ship " (ship/id ship) " staying still.")
+        (command (ship/stay-still ship)))
+      (do
+        (log "Ship " (ship/id ship) " moving randomly.")
+        (command
+         (ship/move ship (game-map/naive-navigate direction)))))))
 
 (defn return-or-gather
   "Return to shipyard if full, otherwise gather halite in random directions"
   [ship]
-    (if (return? ship)
-      (return ship)
-      (gather ship)))
+  (if (return? ship)
+    (return ship)
+    (gather ship)))
 
