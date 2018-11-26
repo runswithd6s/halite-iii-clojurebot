@@ -1,0 +1,49 @@
+* My Halite-III Clojure Bot
+
+  [[http://halite.io][Halite.io]] is the site of an annual bot competition that 2-Sigma puts
+  on. This year, Halite III, is set in an ocean where we have
+  underwater ships searching for halite. It is used as both a currency
+  to build as well as the game winning condition: the player with the
+  most stored halite (deposited at a depot or shipyard) at the end of
+  the game wins.
+
+  The detailed rules are available on the [[https://halite.io/learn-programming-challenge/game-overview][Learn link]].
+
+** Starting Out
+
+  We start with a shipyard and 5000 halite. The starter kit bot
+  creates ships whenever there is enough stored halite and a ship is
+  not occupying the shipyard. Ships gather halite unless the cell has
+  less than 10% of the maximum per cell, then it moves randomly.
+
+** First Improvement
+
+  One improvement that immediately would improve performance of the
+  bot would be to store the last assigned task of a ship. For example,
+  if it was gathering, that state could be used to help decide what
+  its next task is. If the ship was returning to the depot or
+  shipyard, it could ignore cells unless it needed to "top off" its
+  cargo hold. For this, I'm assigning it a key of ~:task~ with a
+  symbol value of ~:gather~ or ~:return~.
+
+** Planned Improvements or Strategies
+
+   - Build depots
+     - On heavy halite deposits
+     - Near opponent depots/shipyards
+   - Better navigation
+     - Mark position risks before ship commands
+     - Decide move based on risk, target, and task
+   - Different gathering strategies
+     - Choose different % of cell halite to leave
+     - Gather near an opponent
+     - Only within given radius of depot or shipyard
+   - Gather near opponent occupied space
+     - Decide how much to influence them (since it's mutual)
+   - Collide with opponent ships
+   - Occupy opponent depots
+     - Requires bot to examine what's in a cell
+     - An opponent bot may also do this to this bot
+   - Crash-ships over depots/shipyards at game ending
+   - Calculate cost to move from a cell at time of map update
+   - Flag high-value targets at time of map update

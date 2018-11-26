@@ -4,6 +4,7 @@
             [hlt.input :refer [as-int]]
             [hlt.state :refer [constants]]
             [hlt.ship :as ship]
+            [MyBot.ship-tasks :as st]
             [hlt.shipyard :as shipyard]
             [hlt.direction :as direction]
             [hlt.game-map :as game-map]
@@ -38,22 +39,9 @@
     ;; changes every turn, and you refresh that state by running update-frame
     (game/update-frame)
 
-    ;; below is a naive example of handling a turn
-
-    ;; For each of your ships, move randomly if the ship is on a low halite
-    ;; location or the ship is full. Else, collect halite.
-    (let [me (game/me) ;; option 1: get player, destructure by hand
-          {:keys [shipyard halite ships dropoffs]} me]
-      (doseq [[_ ship] ships]
-        (let [{:keys [::ship/id position halite]} ship
-              cell (game-map/at ship)]
-          (log "Ship:" id  "has"  halite "halite.")
-          (if (or (< (:halite cell) (/ (constants :MAX_HALITE) 10))
-                (ship/is-full? ship))
-            (game/command
-              (ship/move ship
-                (get (direction/get-all-cardinals) (rrand-int 4))))
-            (game/command (ship/stay-still ship))))))
+    ;; For each ship, return to shipyard if full or gather halite
+    (doseq [[_ ship] (game/me :ships)]
+      (st/return-or-gather ship))
 
     ;; If the game is in the first 200 turns and you have enough
     ;; halite, spawn a ship. Don't spawn a ship if you currently have
