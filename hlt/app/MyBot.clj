@@ -1,12 +1,11 @@
 (ns MyBot
   (:require [hlt.log :refer [log]]
-            [hlt.random :refer [set-seed! rrand-int]]
+            [hlt.random :refer [set-seed!]]
             [hlt.input :refer [as-int]]
             [hlt.state :refer [constants]]
             [hlt.ship :as ship]
             [MyBot.ship-tasks :as st]
             [hlt.shipyard :as shipyard]
-            [hlt.direction :as direction]
             [hlt.game-map :as game-map]
             [hlt.game :as game])
   (:gen-class))
