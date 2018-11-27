@@ -1,11 +1,13 @@
 (ns MyBot.ship-tasks
   (:require [hlt.direction :refer [get-all-cardinals]]
-            [hlt.game :refer [command me]]
             [hlt.log :refer [log]]
             [hlt.random :refer [rrand-int]]
             [hlt.state :refer [constants]]
+            [hlt.game :as game]
             [hlt.game-map :as game-map]
             [hlt.map-cell :as map-cell]
+            [hlt.player :as player]
+            [hlt.position :as position]
             [hlt.ship :as ship]))
 
 (defonce ship-metadata (atom {}))
@@ -18,6 +20,7 @@
 (defn set-metadata
   "Set metadata on ship"
   [ship key value]
+  (log "➥ setting " key " to " value)
   (swap! ship-metadata update-in [(ship/id ship)] assoc key value))
 
 (defn target
@@ -46,25 +49,31 @@
 (defn can-move?
   "Returns true if ship has enough halite in cargo to move out of cell."
   [ship]
-  (let [cell (game-map/at ship)]
+  (let [cell (game-map/at ship)
+        cell-position (map-cell/position cell)
+        cell-halite (map-cell/halite-amount cell)]
+    (log cell-position "has" cell-halite "halite remaining.")
     (or (= 0 (map-cell/halite-amount cell))
         (> (ship/halite-amount ship) (/ (map-cell/halite-amount cell) 10)))))
 
 (defn return?
   "Should the ship return to a shipyard or depot?"
   [ship]
-  (log "Ship:" (ship/id ship)  "has" (ship/halite-amount ship) "halite.")
+  (log "➥ has " (ship/halite-amount ship) "halite.")
   (or (and (= (task ship) :return)
-           (> 0 (ship/halite-amount ship)))
+           (> 500 (ship/halite-amount ship)))
       (ship/is-full? ship)))
 
 (defn return
   "Return a ship to shipyard"
   [ship]
-  (log "Ship:" (ship/id ship) "returning to shipyard.")
-  (let [shipyard (me [:shipyard :position])]
+  (log "➥ returning to shipyard.")
+  (let [shipyard (game/me :shipyard :position)
+        here (ship/position ship)]
     (update-task ship :return)
-    (command (ship/move (game-map/naive-navigate shipyard)))))
+    (game/command
+     (ship/move ship
+      (game-map/get-target-direction here shipyard)))))
 
 (defn gather?
   "Should the ship move from the current spot?"
@@ -72,20 +81,26 @@
   (and (can-move? ship)
        (> (map-cell/halite-amount cell) (/ (constants :MAX_HALITE) cell-max-pct))))
 
+;; doesn't work
+(defn get-safe-cardinals
+  [cell]
+  (let [here (map-cell/position cell)]
+  (filter #(not (game-map/is-occupied? (game-map/normalize (position/add-position here %)))) (get-all-cardinals))))
+
 (defn gather
   "Gather halite or move to gather halite."
   [ship]
   (let [cell (game-map/at ship)
-        direction (get (get-all-cardinals) (rrand-int 4))]
+        target (get (get-all-cardinals) (rrand-int 4))]
     (update-task ship :gather)
     (if (gather? ship cell 10)
       (do
-        (log "Ship " (ship/id ship) " staying still.")
-        (command (ship/stay-still ship)))
+        (log "➥ staying still.")
+        (game/command (ship/stay-still ship)))
       (do
-        (log "Ship " (ship/id ship) " moving randomly.")
-        (command
-         (ship/move ship (game-map/naive-navigate direction)))))))
+        (log "➥ moving randomly.")
+        (game/command
+         (ship/move ship target))))))
 
 (defn return-or-gather
   "Return to shipyard if full, otherwise gather halite in random directions"

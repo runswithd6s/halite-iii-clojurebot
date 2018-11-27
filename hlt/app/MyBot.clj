@@ -40,6 +40,7 @@
 
     ;; For each ship, return to shipyard if full or gather halite
     (doseq [[_ ship] (game/me :ships)]
+      (log "Commanding ship" (ship/id ship))
       (st/return-or-gather ship))
 
     ;; If the game is in the first 200 turns and you have enough

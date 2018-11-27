@@ -10,4 +10,4 @@ seed=""
 bot0="java -jar $jar $seed"
 bot1=$bot0
 
-./halite --replay-directory replays/ -vvv --width 32 --height 32 "$bot0" "$bot1"
+halite --replay-directory replays/ -vvv --width 32 --height 32 "$bot0" "$bot1"
