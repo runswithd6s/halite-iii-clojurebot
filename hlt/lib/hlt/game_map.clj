@@ -62,11 +62,13 @@
         cx (if (> tx sx)
              direction/east
              (if (< tx sx)
-               direction/west))
+               direction/west
+               sx))
         cy (if (> ty sy)
              direction/south
              (if (< ty sy)
-               direction/north))]
+               direction/north
+               sy))]
     [cx cy]))
 
 (defn get-unsafe-moves
